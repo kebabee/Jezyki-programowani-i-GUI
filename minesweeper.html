@@ -1,0 +1,98 @@
+<!--
+Saper.
+W dokumencie html umieść tabelę o 10 wierszach i 10 kolumnach.
+Napisz skrypt, który w 10 losowych komórkach tabeli doda atrybut className="bomba". Do każdej komórki dodaj obsługę zdarzenia onclick.
+Kliknięcie komórki o klasie bomba powinno zmieniać kolor tła każdej komórki zawierającej bombę na czerwony.
+Kliknięcie innej komórki, powinno powodować pokazanie ile w sumie jest bomb w otaczających komórkach.
+W momencie odsłonięcia ostatniej komórki bez bomby powinienpojawiać się komunikat o wygranej.
+Do aplikacji dodaj przyciski umożliwiające rozpoczęcie nowej gry na dla różnych poziomach trudności (% bomb) i rozmiarach planszy.
+-->
+
+<style>
+    td {
+    height: 25px;
+    width: 25px;
+    border: solid black 1px;
+    text-align: center;
+    }
+</style>
+<button onclick="restart()">Restart</button>
+<button onclick="cheat()">Dla oszustów</button>
+<div id="id"></div>
+<script>
+    function restart() {
+        location.reload();
+    }
+    let b = false;
+    function cheat() { // "narzędzie developerskie"
+        if (!b) {
+            for(a of document.querySelectorAll(".bomba")) {
+                a.style.backgroundColor = "pink";
+            };
+            b = true;
+        } else {
+            for(a of document.querySelectorAll(".bomba")) {
+                a.style.backgroundColor = "white";
+            };
+            b = false;
+        }
+    }
+    function generujPlansze(proc,wym) {
+        let plansza = document.getElementById("id");
+        for (let i = 1; i <= wym; i++) {
+            let tr = document.createElement("tr");
+            for (let j = 1; j <= wym; j++) {
+                let td = document.createElement("td");
+                td.onclick = () => {
+                    if (td.classList.contains("bomba")) {
+                        document.querySelectorAll(".bomba").forEach((td) => {
+                            td.style.backgroundColor = "red";
+                        });
+                        alert("Koniec gry!");
+                    } else {
+                        td.style.backgroundColor = "greenyellow";
+                        td.classList.add("odkryte");
+                        otoczenie(td);
+                        if (!(document.querySelectorAll("td:not(.bomba):not(.odkryte)")).length) { //true gdy nie ma elementów bez klasy "bomba" lub "odkryte"
+                            alert("Wygrałeś!");
+                        }
+                    }
+            }
+
+            td.setAttribute("id", i + "." + j);
+            tr.appendChild(td);
+            plansza.appendChild(tr);
+        }
+        }
+        let ilość = Math.floor(wym*wym*proc/100);
+        for (let i = 1; i <= ilość; i++) {
+            let a = Math.floor(Math.random()*(wym)+1);
+            let b = Math.floor(Math.random()*(wym)+1);
+            console.log(`${a} . ${b}`); //do debugowania
+            let c = document.getElementById(`${a}.${b}`)
+            if (c.classList.length == 0) { //true gdy komórka nie ma bomby
+                c.classList.add("bomba");
+            } else {
+                i--; //dodatkowe powtórzenie "w poszukiwaniu" wolnej komórki
+            }
+        }
+    }
+    function otoczenie(td){
+        let bombyOtoczenie = 0;
+        let d = td.id.split(".");
+        for (let i = (parseInt(d[0])-1); i <= (parseInt(d[0])+1); i++) {
+            for (let j = (parseInt(d[1])-1); j <= (parseInt(d[1])+1); j++) {
+                if (i >= 1 && i <= wymiar && j >= 1 && j <= wymiar) {
+                    if (document.getElementById(`${i}.${j}`).classList.contains("bomba")) {
+                        bombyOtoczenie++;
+                    }
+                }
+            }
+        }
+        td.textContent=bombyOtoczenie;
+    }
+
+    let wymiar = prompt("Wymiar planszy:");
+    let procent = prompt("Procent komórek z bombą:");
+    generujPlansze(procent, wymiar);
+</script>
