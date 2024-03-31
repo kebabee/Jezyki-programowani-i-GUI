@@ -1,0 +1,50 @@
+<!--
+Użyj new Map, by policzyć, ile razy każde ze słów występuje w tekście dowolnie złożonego dokumentu html zawierającego twój skrypt.
+Wynik dodaj na końcu dokumentuw ramce, która po kliknięciu znaku x w prawym górnym jej rogu zostanie z dokumentu usunięta (remove).
+-->
+
+<body>
+słowo słowo słowo niesłowo niesłowo niesłowo niesłowo</body>
+<script>
+	let tekst = document.body.textContent;
+	let licznik = new Map();
+
+	tekst.split(/\s/).forEach(function(a) {
+		if (a.match(/^\p{L}+$/u)) {
+			if (licznik.has(a)) {
+				licznik.set(a, licznik.get(a) + 1);
+			}
+			else {
+				licznik.set(a, 1);
+			}
+		}
+	});
+
+	let wynik = document.createElement("table");
+	let wynikRow = wynik.insertRow();
+	wynikRow.insertCell().textContent = "Słowo:";
+	wynikRow.insertCell().textContent = "Ilość:";
+
+	licznik.forEach(function(licznik, a) {
+		let wynikRow = wynik.insertRow();
+		wynikRow.insertCell().textContent = a;
+		wynikRow.insertCell().textContent = licznik;
+	});
+    let ramka = document.createElement('div');
+    ramka.style.border = '2px solid black';
+    ramka.style.display = 'inline-block';
+    ramka.appendChild(wynik);
+    document.body.appendChild(ramka);
+
+	let X = document.createElement("button");
+	X.textContent = "X";
+	X.style.position = "absolute";
+	X.style.top = "0";
+	X.style.right = "0";
+	X.onclick = function() {
+		ramka.remove();
+		X.remove();
+	};
+	document.body.appendChild(X);
+    // testA testA testA testA testB testB testB testC testC testD
+</script>
